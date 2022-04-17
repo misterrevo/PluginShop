@@ -39,33 +39,4 @@ class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(authorizationFilter);
     }
 
-    @Bean
-    public LoginFilter loginFilter(AuthenticationManager authenticationManager, AuthenticationFailureHandler authenticationFailureHandler, AuthenticationSuccessHandler authenticationSuccessHandler){
-        return new LoginFilter(authenticationManager, authenticationFailureHandler, authenticationSuccessHandler);
-    }
-
-    @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler(JwtPort jwtPort){
-        return new LoginSuccessHandler(jwtPort);
-    }
-
-    @Bean
-    public AuthenticationFailureHandler authenticationFailureHandler(){
-        return new LoginFailureHandler();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(DetailsService detailsService, EncoderPort encoderPort){
-        return new AuthManager(detailsService, encoderPort);
-    }
-
-    @Bean
-    public DetailsService detailsService(UserRepositoryPort userRepositoryPort){
-        return new DetailsService(userRepositoryPort);
-    }
-
-    @Bean
-    public BasicAuthenticationFilter basicAuthenticationFilter(AuthenticationManager authenticationManager, DetailsService detailsService){
-        return new AuthorizationFilter(authenticationManager, detailsService);
-    }
 }

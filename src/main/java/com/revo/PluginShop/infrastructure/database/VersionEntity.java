@@ -29,6 +29,6 @@ class VersionEntity {
     private String version;
     @Column(nullable = false, unique = true)
     private String file;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String changelog;
 }

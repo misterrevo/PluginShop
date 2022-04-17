@@ -2,6 +2,7 @@ package com.revo.PluginShop.domain;
 
 import com.revo.PluginShop.domain.dto.PluginDto;
 import com.revo.PluginShop.domain.dto.UserDto;
+import com.revo.PluginShop.domain.dto.VersionDto;
 import com.revo.PluginShop.domain.exception.FileSavingException;
 import com.revo.PluginShop.domain.exception.PluginDoesNotExistsException;
 import com.revo.PluginShop.domain.exception.UserDoesNotExistsException;
@@ -9,14 +10,14 @@ import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.PluginRepositoryPort;
 import com.revo.PluginShop.domain.port.PluginServicePort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
-import com.revo.PluginShop.domain.port.UserServicePort;
-import com.revo.PluginShop.infrastructure.application.rest.dto.PluginCreateDto;
-import com.revo.PluginShop.infrastructure.application.rest.dto.PluginEditDto;
+import com.revo.PluginShop.infrastructure.application.rest.dto.PluginRestDto;
+import com.revo.PluginShop.infrastructure.application.rest.dto.VersionRestDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class PluginService implements PluginServicePort {
@@ -54,7 +55,7 @@ public class PluginService implements PluginServicePort {
     }
 
     @Override
-    public PluginDto createNewPlugin(PluginCreateDto createDto, MultipartFile pluginFile, MultipartFile iconFile) {
+    public PluginDto createNewPlugin(PluginRestDto createDto, MultipartFile pluginFile, MultipartFile iconFile) {
         var pluginFileName = savePlugin(pluginFile);
         var iconFileName = saveIcon(iconFile);
         var plugin = buildPlugin(createDto, pluginFileName, iconFileName);
@@ -66,7 +67,7 @@ public class PluginService implements PluginServicePort {
         return pluginRepositoryPort.savePlugin(pluginDto);
     }
 
-    private Plugin buildPlugin(PluginCreateDto createDto, String pluginFileName, String iconFileName) {
+    private Plugin buildPlugin(PluginRestDto createDto, String pluginFileName, String iconFileName) {
         return Plugin.Builder.aPlugin()
                 .name(createDto.getName())
                 .description(createDto.getDescription())
@@ -132,7 +133,7 @@ public class PluginService implements PluginServicePort {
     }
 
     @Override
-    public PluginDto changePluginData(PluginEditDto editDto) {
+    public PluginDto changePluginData(PluginRestDto editDto) {
         var plugin = getPlugin(editDto.getId());
         plugin.setDescription(editDto.getDescription());
         plugin.setPrice(editDto.getPrice());
@@ -178,6 +179,39 @@ public class PluginService implements PluginServicePort {
         var updatedUserDto = Mapper.toDto(user);
         userRepositoryPort.saveUser(updatedUserDto);
         return Mapper.toDto(plugin);
+    }
+
+    @Override
+    public VersionDto addVersionToPluginOrUpdateById(VersionRestDto versionCreateDto, MultipartFile file) {
+        var plugin = getPlugin(versionCreateDto.getPluginId());
+        var pluginFileName = savePlugin(file);
+        var version = buildVersion(versionCreateDto, pluginFileName);
+        var versions = plugin.getVersions();
+        versions.add(version);
+        return versionToDto(version);
+    }
+
+    private Version buildVersion(VersionRestDto versionCreateDto, String pluginFileName) {
+        return Version.Builder.aVersion()
+                .pluginId(versionCreateDto.getPluginId())
+                .changelog(versionCreateDto.getChangelog())
+                .file(pluginFileName)
+                .version(versionCreateDto.getVersion())
+                .build();
+    }
+
+    private VersionDto versionToDto(Version version) {
+        return Mapper.toDto(version);
+    }
+
+    @Override
+    public void deletePluginById(Long id) {
+        pluginRepositoryPort.deletePluginById(id);
+    }
+
+    @Override
+    public void deleteVersionById(Long id) {
+        pluginRepositoryPort.deleteVersionById(id);
     }
 
     private UserDto getUser(String email) {

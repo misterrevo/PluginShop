@@ -89,17 +89,27 @@ class Mapper {
 
     private static List<VersionDto> mapVersionsToDto(List<Version> versions, Long id) {
         return versions.stream()
-                .map(target -> mapVersionToDto(target, id))
+                .map(target -> mapVersionFromListToDto(target, id))
                 .toList();
     }
 
-    private static VersionDto mapVersionToDto(Version target, Long id) {
+    private static VersionDto mapVersionFromListToDto(Version target, Long id) {
         return VersionDto.Builder.aVersionDto()
                 .id(target.getId())
                 .pluginId(id)
                 .version(target.getVersion())
                 .file(target.getFile())
                 .changelog(target.getChangelog())
+                .build();
+    }
+
+    static VersionDto toDto(Version version){
+        return VersionDto.Builder.aVersionDto()
+                .id(version.getId())
+                .pluginId(version.getPluginId())
+                .version(version.getVersion())
+                .file(version.getFile())
+                .changelog(version.getChangelog())
                 .build();
     }
 }

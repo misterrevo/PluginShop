@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -39,6 +40,7 @@ class PluginEntity {
     @Column(nullable = false)
     private double price;
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("version")
     @JoinColumn(name = "plugin_id")
     private List<VersionEntity> versions;
     @Column(nullable = false)

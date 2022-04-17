@@ -67,4 +67,14 @@ class PluginRepositoryAdapter implements PluginRepositoryPort {
     public long getNextIdOfPlugin() {
         return pluginRepository.getNextIdOfPlugin();
     }
+
+    @Override
+    public void deletePluginById(Long id) {
+        pluginRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteVersionById(Long id) {
+        versionRepository.deleteById(id);
+    }
 }

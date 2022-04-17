@@ -15,4 +15,6 @@ public interface PluginRepositoryPort {
     boolean existsIconByName(String name);
     List<PluginDto> getAllContainsName(String name);
     long getNextIdOfPlugin();
+    void deletePluginById(Long id);
+    void deleteVersionById(Long id);
 }

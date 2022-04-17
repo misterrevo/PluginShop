@@ -1,7 +1,7 @@
 package com.revo.PluginShop.infrastructure.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revo.PluginShop.infrastructure.application.rest.dto.UserCredentialsDto;
+import com.revo.PluginShop.infrastructure.application.rest.dto.UserRestDto;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,11 +10,13 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Component
 class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private static final String PROCCESS_URL = "/login";
@@ -33,7 +35,7 @@ class LoginFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         try {
-            UserCredentialsDto credentials = mapFromJson(request);
+            UserRestDto credentials = mapFromJson(request);
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(credentials.getEmail(), credentials.getPassword());
             setDetails(request, token);
             return authenticate(token);
@@ -46,7 +48,7 @@ class LoginFilter extends UsernamePasswordAuthenticationFilter {
         return getAuthenticationManager().authenticate(token);
     }
 
-    private UserCredentialsDto mapFromJson(HttpServletRequest request) throws IOException {
-        return objectMapper.readValue(request.getInputStream(), UserCredentialsDto.class);
+    private UserRestDto mapFromJson(HttpServletRequest request) throws IOException {
+        return objectMapper.readValue(request.getInputStream(), UserRestDto.class);
     }
 }

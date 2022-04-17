@@ -10,8 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 class AuthManager implements AuthenticationManager {
 
     private static final String NULL_EXCEPTION_MESSAGE = "Credentials can't be null!";

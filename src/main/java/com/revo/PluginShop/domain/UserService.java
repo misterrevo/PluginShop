@@ -6,7 +6,7 @@ import com.revo.PluginShop.domain.exception.UserNameInUseException;
 import com.revo.PluginShop.domain.port.EncoderPort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
 import com.revo.PluginShop.domain.port.UserServicePort;
-import com.revo.PluginShop.infrastructure.application.rest.dto.UserCredentialsDto;
+import com.revo.PluginShop.infrastructure.application.rest.dto.UserRestDto;
 
 public class UserService implements UserServicePort {
 
@@ -19,7 +19,7 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public UserDto createNewUser(UserCredentialsDto createDto) {
+    public UserDto createNewUser(UserRestDto createDto) {
         var email = createDto.getEmail();
         if(existsByEmail(email)){
             throw new UserNameInUseException(email);
@@ -37,7 +37,7 @@ public class UserService implements UserServicePort {
         return userRepositoryPort.existsUserByEmail(email);
     }
 
-    private User buildUser(UserCredentialsDto createDto) {
+    private User buildUser(UserRestDto createDto) {
         var encodedPassword = encodePassword(createDto.getPassword());
         return User.Builder.anUser()
                 .email(createDto.getEmail())

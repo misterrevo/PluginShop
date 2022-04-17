@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Component
 class AuthorizationFilter extends BasicAuthenticationFilter {
 
     private static final String TOKEN_HEADER = "Authorization";

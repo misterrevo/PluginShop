@@ -4,15 +4,17 @@ import com.revo.PluginShop.domain.dto.UserDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 class Details implements UserDetails {
 
     private static final String USER_ROLE = "ROLE_USER";
 
-    private UserDto userDto;
+    private final UserDto userDto;
 
     Details(UserDto userDto){
         this.userDto = userDto;
@@ -20,7 +22,7 @@ class Details implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.asList(USER_ROLE).stream()
+        return Stream.of(USER_ROLE)
                 .map(target -> new SimpleGrantedAuthority(target))
                 .toList();
     }

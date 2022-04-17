@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 class DetailsService implements UserDetailsService {
 
     private final UserRepositoryPort userRepositoryPort;

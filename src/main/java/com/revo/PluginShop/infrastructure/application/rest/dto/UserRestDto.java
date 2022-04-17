@@ -3,7 +3,7 @@ package com.revo.PluginShop.infrastructure.application.rest.dto;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 
-public class UserCredentialsDto {
+public class UserRestDto {
 
     @Email
     private String email;
