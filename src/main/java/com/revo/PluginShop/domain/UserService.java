@@ -8,6 +8,8 @@ import com.revo.PluginShop.domain.port.UserRepositoryPort;
 import com.revo.PluginShop.domain.port.UserServicePort;
 import com.revo.PluginShop.infrastructure.application.rest.dto.UserRestDto;
 
+import static com.revo.PluginShop.domain.Mapper.toDto;
+
 public class UserService implements UserServicePort {
 
     private final UserRepositoryPort userRepositoryPort;
@@ -25,7 +27,7 @@ public class UserService implements UserServicePort {
             throw new UserNameInUseException(email);
         }
         var user = buildUser(createDto);
-        var userDto = Mapper.toDto(user);
+        var userDto = toDto(user);
         return saveUser(userDto);
     }
 

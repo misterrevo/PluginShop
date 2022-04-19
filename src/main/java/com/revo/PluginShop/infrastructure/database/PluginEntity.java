@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,10 +40,12 @@ class PluginEntity {
     private String type;
     @Column(nullable = false)
     private double price;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.PERSIST)
     @OrderBy("version")
     @JoinColumn(name = "plugin_id")
-    private List<VersionEntity> versions;
+    private List<VersionEntity> versions = new ArrayList<>();
+    @Column(nullable = false)
+    private double minecraftVersion;
     @Column(nullable = false)
     private String videoUrl;
     @Column(nullable = false)

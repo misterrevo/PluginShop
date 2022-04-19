@@ -17,7 +17,10 @@ public interface PluginServicePort {
     PluginDto changePluginData(PluginRestDto editDto);
     PluginDto changePluginIcon(Long id, MultipartFile iconFile);
     PluginDto updatePluginFile(Long id, MultipartFile pluginFile);
-    PluginDto buyPlugin(Long id, String token);
-    VersionDto addVersionToPluginOrUpdateById(VersionRestDto versionCreateDto, MultipartFile file);
+    PluginDto buyPlugin(Long id, String email);
+    VersionDto addVersionToPluginOrUpdateById(VersionRestDto versionCreateDto, MultipartFile pluginFile);
     void deletePluginById(Long id);
-    void deleteVersionById(Long id);}
+    void deleteVersionById(Long id);
+    PluginDto getPluginById(Long id);
+    VersionDto getVersionById(Long id);
+}

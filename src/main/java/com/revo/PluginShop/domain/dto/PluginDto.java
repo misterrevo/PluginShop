@@ -11,10 +11,11 @@ public class PluginDto {
     private String type;
     private double price;
     private List<VersionDto> versions;
+    private double minecraftVersion;
     private String videoUrl;
     private String icon;
 
-    public PluginDto(Long id, Long userId, String name, String description, String type, double price, List<VersionDto> versions, String videoUrl, String icon) {
+    public PluginDto(Long id, Long userId, String name, String description, String type, double price, List<VersionDto> versions, double minecraftVersion, String videoUrl, String icon) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -22,6 +23,7 @@ public class PluginDto {
         this.type = type;
         this.price = price;
         this.versions = versions;
+        this.minecraftVersion = minecraftVersion;
         this.videoUrl = videoUrl;
         this.icon = icon;
     }
@@ -74,6 +76,14 @@ public class PluginDto {
         this.versions = versions;
     }
 
+    public double getMinecraftVersion() {
+        return minecraftVersion;
+    }
+
+    public void setMinecraftVersion(double minecraftVersion) {
+        this.minecraftVersion = minecraftVersion;
+    }
+
     public String getVideoUrl() {
         return videoUrl;
     }
@@ -106,6 +116,7 @@ public class PluginDto {
         private String type;
         private double price;
         private List<VersionDto> versions;
+        private double minecraftVersion;
         private String videoUrl;
         private String icon;
 
@@ -151,6 +162,11 @@ public class PluginDto {
             return this;
         }
 
+        public Builder minecraftVersion(double minecraftVersion){
+            this.minecraftVersion = minecraftVersion;
+            return this;
+        }
+
         public Builder videoUrl(String videoUrl) {
             this.videoUrl = videoUrl;
             return this;
@@ -162,7 +178,7 @@ public class PluginDto {
         }
 
         public PluginDto build() {
-            return new PluginDto(id, userId, name, description, type, price, versions, videoUrl, icon);
+            return new PluginDto(id, userId, name, description, type, price, versions, minecraftVersion, videoUrl, icon);
         }
     }
 }

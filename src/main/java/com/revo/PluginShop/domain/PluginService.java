@@ -4,9 +4,10 @@ import com.revo.PluginShop.domain.dto.PluginDto;
 import com.revo.PluginShop.domain.dto.UserDto;
 import com.revo.PluginShop.domain.dto.VersionDto;
 import com.revo.PluginShop.domain.exception.FileSavingException;
+import com.revo.PluginShop.domain.exception.PaymentException;
+import com.revo.PluginShop.domain.exception.PluginAddException;
 import com.revo.PluginShop.domain.exception.PluginDoesNotExistsException;
 import com.revo.PluginShop.domain.exception.UserDoesNotExistsException;
-import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.PluginRepositoryPort;
 import com.revo.PluginShop.domain.port.PluginServicePort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
@@ -17,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+
+import static com.revo.PluginShop.domain.Mapper.fromDto;
+import static com.revo.PluginShop.domain.Mapper.toDto;
 
 public class PluginService implements PluginServicePort {
 
@@ -30,12 +33,10 @@ public class PluginService implements PluginServicePort {
     private static final String FIRST_VERSION_CHANGELOG = "IT'S FIRST VERSION OF PLUGIN!";
 
     private final PluginRepositoryPort pluginRepositoryPort;
-    private final JwtPort jwtPort;
     private final UserRepositoryPort userRepositoryPort;
 
-    public PluginService(PluginRepositoryPort pluginRepositoryPort, JwtPort jwtPort, UserRepositoryPort userRepositoryPort) {
+    public PluginService(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort) {
         this.pluginRepositoryPort = pluginRepositoryPort;
-        this.jwtPort = jwtPort;
         this.userRepositoryPort = userRepositoryPort;
     }
 
@@ -59,7 +60,7 @@ public class PluginService implements PluginServicePort {
         var pluginFileName = savePlugin(pluginFile);
         var iconFileName = saveIcon(iconFile);
         var plugin = buildPlugin(createDto, pluginFileName, iconFileName);
-        var pluginDto = Mapper.toDto(plugin);
+        var pluginDto = toDto(plugin);
         return save(pluginDto);
     }
 
@@ -140,7 +141,7 @@ public class PluginService implements PluginServicePort {
         plugin.setName(editDto.getName());
         plugin.setType(PluginType.valueOf(editDto.getType()));
         plugin.setVideoUrl(editDto.getVideoUrl());
-        var pluginDto = Mapper.toDto(plugin);
+        var pluginDto = toDto(plugin);
         return save(pluginDto);
     }
 
@@ -155,7 +156,7 @@ public class PluginService implements PluginServicePort {
         var plugin = getPlugin(id);
         var iconFileName = saveIcon(iconFile);
         plugin.setIcon(iconFileName);
-        var pluginDto = Mapper.toDto(plugin);
+        var pluginDto = toDto(plugin);
         return save(pluginDto);
     }
 
@@ -164,21 +165,28 @@ public class PluginService implements PluginServicePort {
         var plugin = getPlugin(id);
         var pluginFileName = savePlugin(pluginFile);
         plugin.setIcon(pluginFileName);
-        var pluginDto = Mapper.toDto(plugin);
+        var pluginDto = toDto(plugin);
         return save(pluginDto);
     }
 
     @Override
-    public PluginDto buyPlugin(Long id, String token) {
-        var email = jwtPort.getEmailFromToken(token);
+    public PluginDto buyPlugin(Long id, String email) {
         var userDto = getUser(email);
-        var user = Mapper.fromDto(userDto);
+        var user = fromDto(userDto);
         var plugins = user.getPlugins();
         var plugin = getPlugin(id);
-        plugins.add(plugin);
-        var updatedUserDto = Mapper.toDto(user);
+        add(plugins, plugin);
+        var updatedUserDto = toDto(user);
         userRepositoryPort.saveUser(updatedUserDto);
-        return Mapper.toDto(plugin);
+        return toDto(plugin);
+    }
+
+    private void add(List<Plugin> plugins, Plugin plugin){
+        if(!plugins.contains(plugin)){
+            plugins.add(plugin);
+            return;
+        }
+        throw new PluginAddException(plugin.getId());
     }
 
     @Override
@@ -201,7 +209,7 @@ public class PluginService implements PluginServicePort {
     }
 
     private VersionDto versionToDto(Version version) {
-        return Mapper.toDto(version);
+        return toDto(version);
     }
 
     @Override
@@ -212,6 +220,17 @@ public class PluginService implements PluginServicePort {
     @Override
     public void deleteVersionById(Long id) {
         pluginRepositoryPort.deleteVersionById(id);
+    }
+
+    @Override
+    public PluginDto getPluginById(Long id) {
+        var plugin = getPlugin(id);
+        return toDto(plugin);
+    }
+
+    @Override
+    public VersionDto getVersionById(Long id) {
+        return pluginRepositoryPort.getVersionById(id);
     }
 
     private UserDto getUser(String email) {

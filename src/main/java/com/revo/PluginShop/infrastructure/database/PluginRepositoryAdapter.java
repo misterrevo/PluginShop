@@ -1,13 +1,19 @@
 package com.revo.PluginShop.infrastructure.database;
 
 import com.revo.PluginShop.domain.dto.PluginDto;
+import com.revo.PluginShop.domain.dto.VersionDto;
+import com.revo.PluginShop.domain.exception.VersionDoesNotExistsException;
 import com.revo.PluginShop.domain.port.PluginRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.revo.PluginShop.infrastructure.database.Mapper.toDomain;
+
 @RequiredArgsConstructor
+@Component
 class PluginRepositoryAdapter implements PluginRepositoryPort {
 
     private static final String FREE_TYPE = "FREE";
@@ -44,7 +50,7 @@ class PluginRepositoryAdapter implements PluginRepositoryPort {
     public PluginDto savePlugin(PluginDto pluginDto) {
         var pluginEntity = Mapper.toEntity(pluginDto);
         var savedPlugin = pluginRepository.save(pluginEntity);
-        return Mapper.toDomain(savedPlugin);
+        return toDomain(savedPlugin);
     }
 
     @Override
@@ -76,5 +82,16 @@ class PluginRepositoryAdapter implements PluginRepositoryPort {
     @Override
     public void deleteVersionById(Long id) {
         versionRepository.deleteById(id);
+    }
+
+    @Override
+    public VersionDto getVersionById(Long id) {
+        var version = getVersion(id);
+        return toDomain(version);
+    }
+
+    private VersionEntity getVersion(Long id) {
+        return versionRepository.findById(id)
+                .orElseThrow(() -> new VersionDoesNotExistsException(id));
     }
 }

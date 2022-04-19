@@ -2,7 +2,9 @@ package com.revo.PluginShop.infrastructure.encoder;
 
 import com.revo.PluginShop.domain.port.EncoderPort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 class BCryptPasswordEncoderAdapter implements EncoderPort {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();

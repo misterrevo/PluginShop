@@ -1,6 +1,7 @@
 package com.revo.PluginShop.domain.port;
 
 import com.revo.PluginShop.domain.dto.PluginDto;
+import com.revo.PluginShop.domain.dto.VersionDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,5 @@ public interface PluginRepositoryPort {
     long getNextIdOfPlugin();
     void deletePluginById(Long id);
     void deleteVersionById(Long id);
+    VersionDto getVersionById(Long id);
 }

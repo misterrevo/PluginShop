@@ -20,7 +20,9 @@ class Mapper {
     }
 
     private static List<PluginEntity> mapPluginsToEntity(List<PluginDto> plugins) {
-        return null;
+        return plugins.stream()
+                .map(Mapper::toEntity)
+                .toList();
     }
 
     static PluginEntity toEntity(PluginDto pluginDto){
@@ -32,6 +34,7 @@ class Mapper {
                 .type(pluginDto.getType())
                 .price(pluginDto.getPrice())
                 .versions(mapVersionsToEntity(pluginDto.getVersions()))
+                .minecraftVersion(pluginDto.getMinecraftVersion())
                 .videoUrl(pluginDto.getVideoUrl())
                 .icon(pluginDto.getIcon())
                 .build();
@@ -79,6 +82,7 @@ class Mapper {
                 .type(pluginEntity.getType())
                 .price(pluginEntity.getPrice())
                 .versions(mapVersionsToDomain(pluginEntity.getVersions()))
+                .minecraftVersion(pluginEntity.getMinecraftVersion())
                 .videoUrl(pluginEntity.getVideoUrl())
                 .icon(pluginEntity.getIcon())
                 .build();
@@ -90,7 +94,7 @@ class Mapper {
                 .toList();
     }
 
-    private static VersionDto toDomain(VersionEntity versionEntity) {
+    static VersionDto toDomain(VersionEntity versionEntity) {
         return VersionDto.Builder.aVersionDto()
                 .id(versionEntity.getId())
                 .pluginId(versionEntity.getPluginId())

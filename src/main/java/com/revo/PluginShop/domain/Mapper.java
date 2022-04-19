@@ -34,6 +34,7 @@ class Mapper {
                 .type(PluginType.valueOf(pluginDto.getType()))
                 .price(pluginDto.getPrice())
                 .versions(mapVersionsFromDto(pluginDto.getVersions(), pluginDto.getId()))
+                .minecraftVersion(pluginDto.getMinecraftVersion())
                 .videoUrl(pluginDto.getVideoUrl())
                 .icon(pluginDto.getIcon())
                 .build();
@@ -82,6 +83,7 @@ class Mapper {
                 .type(type.toString())
                 .price(plugin.getPrice())
                 .versions(mapVersionsToDto(plugin.getVersions(), plugin.getId()))
+                .minecraftVersion(plugin.getMinecraftVersion())
                 .videoUrl(plugin.getVideoUrl())
                 .icon(plugin.getIcon())
                 .build();

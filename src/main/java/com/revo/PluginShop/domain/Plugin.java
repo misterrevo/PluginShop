@@ -11,10 +11,11 @@ class Plugin {
     private PluginType type;
     private double price;
     private List<Version> versions;
+    private Double minecraftVersion;
     private String videoUrl;
     private String icon;
 
-    Plugin(Long id, Long userId, String name, String description, PluginType type, double price, List<Version> versions, String videoUrl, String icon) {
+    Plugin(Long id, Long userId, String name, String description, PluginType type, double price, List<Version> versions, double minecraftVersion, String videoUrl, String icon) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -22,6 +23,7 @@ class Plugin {
         this.type = type;
         this.price = price;
         this.versions = versions;
+        this.minecraftVersion = minecraftVersion;
         this.videoUrl = videoUrl;
         this.icon = icon;
     }
@@ -74,6 +76,14 @@ class Plugin {
         this.versions = versions;
     }
 
+    public Double getMinecraftVersion() {
+        return minecraftVersion;
+    }
+
+    public void setMinecraftVersion(Double minecraftVersion) {
+        this.minecraftVersion = minecraftVersion;
+    }
+
     String getVideoUrl() {
         return videoUrl;
     }
@@ -106,6 +116,7 @@ class Plugin {
         private PluginType type;
         private double price;
         private List<Version> versions;
+        private double minecraftVersion;
         private String videoUrl;
         private String icon;
 
@@ -151,6 +162,11 @@ class Plugin {
             return this;
         }
 
+        Builder minecraftVersion(double minecraftVersion){
+            this.minecraftVersion = minecraftVersion;
+            return this;
+        }
+
         Builder videoUrl(String videoUrl) {
             this.videoUrl = videoUrl;
             return this;
@@ -162,7 +178,7 @@ class Plugin {
         }
 
         Plugin build() {
-            return new Plugin(id, userId, name, description, type, price, versions, videoUrl, icon);
+            return new Plugin(id, userId, name, description, type, price, versions, minecraftVersion, videoUrl, icon);
         }
     }
 }
