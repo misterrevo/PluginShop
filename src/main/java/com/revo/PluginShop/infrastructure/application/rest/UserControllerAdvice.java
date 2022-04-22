@@ -12,13 +12,13 @@ class UserControllerAdvice {
 
     @ExceptionHandler(UserDoesNotExistsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String userDoesNotExistsException(UserDoesNotExistsException exception){
+    String userDoesNotExistsException(UserDoesNotExistsException exception){
         return exception.getMessage();
     }
 
     @ExceptionHandler(UserNameInUseException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String userNameInUseException(UserNameInUseException exception){
+    String userNameInUseException(UserNameInUseException exception){
         return exception.getMessage();
     }
 }

@@ -9,14 +9,16 @@ public class UserDto {
     private String password;
     private boolean locked;
     private boolean enabled;
+    private String authority;
     private List<PluginDto> plugins;
 
-    public UserDto(Long id, String email, String password, boolean locked, boolean enabled, List<PluginDto> plugins) {
+    public UserDto(Long id, String email, String password, boolean locked, boolean enabled, String authority, List<PluginDto> plugins) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.locked = locked;
         this.enabled = enabled;
+        this.authority = authority;
         this.plugins = plugins;
     }
 
@@ -60,6 +62,14 @@ public class UserDto {
         this.enabled = enabled;
     }
 
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
     public List<PluginDto> getPlugins() {
         return plugins;
     }
@@ -74,6 +84,7 @@ public class UserDto {
         private String password;
         private boolean locked;
         private boolean enabled;
+        private String authority;
         private List<PluginDto> plugins;
 
         private Builder() {
@@ -108,13 +119,18 @@ public class UserDto {
             return this;
         }
 
+        public Builder authority(String authority){
+            this.authority = authority;
+            return this;
+        }
+
         public Builder plugins(List<PluginDto> plugins) {
             this.plugins = plugins;
             return this;
         }
 
         public UserDto build() {
-            return new UserDto(id, email, password, locked, enabled, plugins);
+            return new UserDto(id, email, password, locked, enabled, authority, plugins);
         }
     }
 }

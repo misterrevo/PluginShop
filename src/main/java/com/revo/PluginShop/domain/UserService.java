@@ -4,6 +4,7 @@ import com.revo.PluginShop.domain.dto.UserDto;
 import com.revo.PluginShop.domain.exception.UserDoesNotExistsException;
 import com.revo.PluginShop.domain.exception.UserNameInUseException;
 import com.revo.PluginShop.domain.port.EncoderPort;
+import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
 import com.revo.PluginShop.domain.port.UserServicePort;
 import com.revo.PluginShop.infrastructure.application.rest.dto.UserRestDto;
@@ -14,10 +15,12 @@ public class UserService implements UserServicePort {
 
     private final UserRepositoryPort userRepositoryPort;
     private final EncoderPort encoderPort;
+    private final JwtPort jwtPort;
 
-    public UserService(UserRepositoryPort userRepositoryPort, EncoderPort encoderPort) {
+    public UserService(UserRepositoryPort userRepositoryPort, EncoderPort encoderPort, JwtPort jwtPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
+        this.jwtPort = jwtPort;
     }
 
     @Override
@@ -55,6 +58,16 @@ public class UserService implements UserServicePort {
     public UserDto getUserByEmail(String email) {
         return userRepositoryPort.getUserByEmail(email)
                 .orElseThrow(() -> new UserDoesNotExistsException(email));
+    }
+
+    @Override
+    public UserDto getUserByToken(String token) {
+        var email = getEmailFromToken(token);
+        return getUserByEmail(email);
+    }
+
+    private String getEmailFromToken(String token) {
+        return jwtPort.getSubject(token);
     }
 
     @Override

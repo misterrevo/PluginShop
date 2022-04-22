@@ -43,11 +43,12 @@ class PluginEntity {
     @OneToMany(cascade = CascadeType.PERSIST)
     @OrderBy("version")
     @JoinColumn(name = "plugin_id")
+    @Builder.Default
     private List<VersionEntity> versions = new ArrayList<>();
     @Column(nullable = false)
     private double minecraftVersion;
     @Column(nullable = false)
     private String videoUrl;
-    @Column(nullable = false)
+    @Column(unique = true)
     private String icon;
 }

@@ -13,19 +13,19 @@ class PluginControllerAdvice {
 
     @ExceptionHandler(FileSavingException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    public String fileSavingException(FileSavingException exception){
+    String fileSavingException(FileSavingException exception){
         return exception.getMessage();
     }
 
     @ExceptionHandler(PluginDoesNotExistsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String pluginDoesNotExistsException(PluginDoesNotExistsException exception){
+    String pluginDoesNotExistsException(PluginDoesNotExistsException exception){
         return exception.getMessage();
     }
 
     @ExceptionHandler(VersionDoesNotExistsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String pluginDoesNotExistsException(VersionDoesNotExistsException exception){
+    String pluginDoesNotExistsException(VersionDoesNotExistsException exception){
         return exception.getMessage();
     }
 }

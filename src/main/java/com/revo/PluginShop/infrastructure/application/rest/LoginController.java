@@ -12,6 +12,6 @@ import javax.validation.Valid;
 @Validated
 class LoginController {
 
-    @PostMapping
+    @PostMapping("/login")
     void login(@Valid @RequestBody UserRestDto credentials){}
 }

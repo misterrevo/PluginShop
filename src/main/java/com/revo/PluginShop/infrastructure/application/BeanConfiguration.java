@@ -4,6 +4,7 @@ import com.revo.PluginShop.domain.PaymentService;
 import com.revo.PluginShop.domain.PluginService;
 import com.revo.PluginShop.domain.UserService;
 import com.revo.PluginShop.domain.port.EncoderPort;
+import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.PaymentServicePort;
 import com.revo.PluginShop.domain.port.PluginRepositoryPort;
 import com.revo.PluginShop.domain.port.PluginServicePort;
@@ -24,13 +25,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 class BeanConfiguration {
 
     @Bean
-    public UserServicePort userServicePort(UserRepositoryPort userRepositoryPort, EncoderPort encoderPort){
-        return new UserService(userRepositoryPort, encoderPort);
+    public UserServicePort userServicePort(UserRepositoryPort userRepositoryPort, EncoderPort encoderPort, JwtPort jwtPort){
+        return new UserService(userRepositoryPort, encoderPort, jwtPort);
     }
 
     @Bean
-    public PluginServicePort pluginServicePort(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort){
-        return new PluginService(pluginRepositoryPort, userRepositoryPort);
+    public PluginServicePort pluginServicePort(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort, JwtPort jwtPort){
+        return new PluginService(pluginRepositoryPort, userRepositoryPort, jwtPort);
     }
 
     @Bean

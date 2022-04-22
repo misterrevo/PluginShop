@@ -1,0 +1,2 @@
+INSERT INTO plugins_versions (id, changelog, file, plugin_id, version) VALUES (null, "test", null, 1, "0.0.1");
+INSERT INTO plugins_versions (id, changelog, file, plugin_id, version) VALUES (null, "delete", null, 1, "0.0.3");

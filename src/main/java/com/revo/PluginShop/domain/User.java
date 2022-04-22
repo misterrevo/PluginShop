@@ -10,14 +10,16 @@ class User {
     private String password;
     private boolean locked;
     private boolean enabled;
+    private String authority;
     private List<Plugin> plugins;
 
-    User(Long id, String email, String password, boolean locked, boolean enabled, List<Plugin> plugins) {
+    User(Long id, String email, String password, boolean locked, boolean enabled, String authority, List<Plugin> plugins) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.locked = locked;
         this.enabled = enabled;
+        this.authority = authority;
         this.plugins = plugins;
     }
 
@@ -61,6 +63,14 @@ class User {
         this.enabled = enabled;
     }
 
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
     List<Plugin> getPlugins() {
         return plugins;
     }
@@ -70,11 +80,15 @@ class User {
     }
 
     static final class Builder {
+
+        private static final String DEFAULT_AUTHORITY = "USER";
+
         private Long id;
         private String email;
         private String password;
         private boolean locked = false;
         private boolean enabled = true;
+        private String authority = DEFAULT_AUTHORITY;
         private List<Plugin> plugins = new ArrayList<>();
 
         private Builder() {
@@ -109,13 +123,18 @@ class User {
             return this;
         }
 
+        Builder authority(String authority){
+            this.authority = authority;
+            return this;
+        }
+
         Builder plugins(List<Plugin> plugins) {
             this.plugins = plugins;
             return this;
         }
 
         User build() {
-            return new User(id, email, password, locked, enabled, plugins);
+            return new User(id, email, password, locked, enabled, authority, plugins);
         }
     }
 }

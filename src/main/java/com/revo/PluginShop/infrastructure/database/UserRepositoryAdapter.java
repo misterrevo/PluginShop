@@ -1,6 +1,7 @@
 package com.revo.PluginShop.infrastructure.database;
 
 import com.revo.PluginShop.domain.dto.UserDto;
+import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import static com.revo.PluginShop.infrastructure.database.Mapper.toEntity;
 class UserRepositoryAdapter implements UserRepositoryPort {
 
     private final UserRepository userRepository;
+    private final JwtPort jwtPort;
 
     @Override
     public Optional<UserDto> getUserByEmail(String email) {

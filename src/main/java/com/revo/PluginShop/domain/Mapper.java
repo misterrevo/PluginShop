@@ -5,6 +5,7 @@ import com.revo.PluginShop.domain.dto.UserDto;
 import com.revo.PluginShop.domain.dto.VersionDto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 class Mapper {
 
@@ -15,6 +16,7 @@ class Mapper {
                 .password(userDto.getPassword())
                 .locked(userDto.isLocked())
                 .enabled(userDto.isEnabled())
+                .authority(userDto.getAuthority())
                 .plugins(mapPluginsFromDto(userDto.getPlugins()))
                 .build();
     }
@@ -22,7 +24,7 @@ class Mapper {
     private static List<Plugin> mapPluginsFromDto(List<PluginDto> plugins) {
         return plugins.stream()
                 .map(Mapper::fromDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     static Plugin fromDto(PluginDto pluginDto){
@@ -43,7 +45,7 @@ class Mapper {
     private static List<Version> mapVersionsFromDto(List<VersionDto> versions, Long id) {
         return versions.stream()
                 .map(target -> mapVersionFromDto(target, id))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private static Version mapVersionFromDto(VersionDto target, Long id) {
@@ -63,6 +65,7 @@ class Mapper {
                 .password(user.getPassword())
                 .locked(user.isLocked())
                 .enabled(user.isEnabled())
+                .authority(user.getAuthority())
                 .plugins(mapPluginsToDto(user.getPlugins(), user.getId()))
                 .build();
     }
@@ -70,7 +73,7 @@ class Mapper {
     private static List<PluginDto> mapPluginsToDto(List<Plugin> plugins, Long userId) {
         return plugins.stream()
                 .map(Mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     static PluginDto toDto(Plugin plugin){
@@ -92,7 +95,7 @@ class Mapper {
     private static List<VersionDto> mapVersionsToDto(List<Version> versions, Long id) {
         return versions.stream()
                 .map(target -> mapVersionFromListToDto(target, id))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private static VersionDto mapVersionFromListToDto(Version target, Long id) {

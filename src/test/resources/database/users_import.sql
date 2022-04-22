@@ -1,0 +1,1 @@
+INSERT INTO users (id, email, enabled, locked, password, authority) VALUES (null, "payment@email.pl", 1, 0, "$2a$10$T7jxjJHtXTwFrStcwBCJX.rCsGHfFFsPg.jg1wJKKjttC23.1Dw/u", "USER");

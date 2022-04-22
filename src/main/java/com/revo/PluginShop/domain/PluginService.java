@@ -3,11 +3,13 @@ package com.revo.PluginShop.domain;
 import com.revo.PluginShop.domain.dto.PluginDto;
 import com.revo.PluginShop.domain.dto.UserDto;
 import com.revo.PluginShop.domain.dto.VersionDto;
+import com.revo.PluginShop.domain.exception.FileReadingException;
 import com.revo.PluginShop.domain.exception.FileSavingException;
-import com.revo.PluginShop.domain.exception.PaymentException;
 import com.revo.PluginShop.domain.exception.PluginAddException;
 import com.revo.PluginShop.domain.exception.PluginDoesNotExistsException;
 import com.revo.PluginShop.domain.exception.UserDoesNotExistsException;
+import com.revo.PluginShop.domain.exception.UserDoesNotHavePlugin;
+import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.PluginRepositoryPort;
 import com.revo.PluginShop.domain.port.PluginServicePort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
@@ -16,8 +18,10 @@ import com.revo.PluginShop.infrastructure.application.rest.dto.VersionRestDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.Arrays;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.revo.PluginShop.domain.Mapper.fromDto;
@@ -25,19 +29,21 @@ import static com.revo.PluginShop.domain.Mapper.toDto;
 
 public class PluginService implements PluginServicePort {
 
-    private static final String ICON_RESOURCE_PATH = "src/main/resources/icons";
-    private static final String PLUGIN_RESOURCE_PATH = "src/main/resources/plugins";
+    private static final String ICON_RESOURCE_PATH = "src/main/resources/icons/";
+    private static final String PLUGIN_RESOURCE_PATH = "src/main/resources/plugins/";
     private static final String ICON_FORMAT = ".png";
     private static final String PLUGIN_FORMAT = ".jar";
-    private static final String FIRST_VERSION_NAME = "0.0.1";
-    private static final String FIRST_VERSION_CHANGELOG = "IT'S FIRST VERSION OF PLUGIN!";
+    private static final String ICON_CLASSPATH = "/icons/";
+    private static final String PLUGIN_CLASSPATH = "/plugins/";
 
     private final PluginRepositoryPort pluginRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
+    private final JwtPort jwtPort;
 
-    public PluginService(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort) {
+    public PluginService(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort, JwtPort jwtPort) {
         this.pluginRepositoryPort = pluginRepositoryPort;
         this.userRepositoryPort = userRepositoryPort;
+        this.jwtPort = jwtPort;
     }
 
     @Override
@@ -56,10 +62,8 @@ public class PluginService implements PluginServicePort {
     }
 
     @Override
-    public PluginDto createNewPlugin(PluginRestDto createDto, MultipartFile pluginFile, MultipartFile iconFile) {
-        var pluginFileName = savePlugin(pluginFile);
-        var iconFileName = saveIcon(iconFile);
-        var plugin = buildPlugin(createDto, pluginFileName, iconFileName);
+    public PluginDto createNewPlugin(PluginRestDto createDto) {
+        var plugin = buildPlugin(createDto);
         var pluginDto = toDto(plugin);
         return save(pluginDto);
     }
@@ -68,27 +72,15 @@ public class PluginService implements PluginServicePort {
         return pluginRepositoryPort.savePlugin(pluginDto);
     }
 
-    private Plugin buildPlugin(PluginRestDto createDto, String pluginFileName, String iconFileName) {
+    private Plugin buildPlugin(PluginRestDto createDto) {
         return Plugin.Builder.aPlugin()
                 .name(createDto.getName())
                 .description(createDto.getDescription())
                 .type(PluginType.valueOf(createDto.getType()))
                 .price(createDto.getPrice())
-                .versions(Arrays.asList(
-                        Version.Builder.aVersion()
-                                .version(FIRST_VERSION_NAME)
-                                .file(pluginFileName)
-                                .changelog(FIRST_VERSION_CHANGELOG)
-                                .pluginId(getNextPluginId())
-                                .build()
-                ))
                 .videoUrl(createDto.getVideoUrl())
-                .icon(iconFileName)
+                .minecraftVersion(createDto.getMinecraftVersion())
                 .build();
-    }
-
-    private Long getNextPluginId() {
-        return pluginRepositoryPort.getNextIdOfPlugin();
     }
 
     private String saveIcon(MultipartFile iconFile) {
@@ -99,7 +91,8 @@ public class PluginService implements PluginServicePort {
         try {
             var file = new File(ICON_RESOURCE_PATH +name+ICON_FORMAT);
             file.createNewFile();
-            iconFile.transferTo(file);
+            var outputStream = new FileOutputStream(file);
+            outputStream.write(iconFile.getBytes());
         } catch (Exception exception){
             throw new FileSavingException();
         }
@@ -118,7 +111,7 @@ public class PluginService implements PluginServicePort {
         return UUID.randomUUID().toString();
     }
 
-    private String savePlugin(MultipartFile pluginFile) {
+    private String savePluginFile(MultipartFile pluginFile) {
         var name = generateName();
         while(existsFileByName(name)){
             name = generateName();
@@ -126,16 +119,18 @@ public class PluginService implements PluginServicePort {
         try {
             var file = new File(PLUGIN_RESOURCE_PATH +name+PLUGIN_FORMAT);
             file.createNewFile();
-            pluginFile.transferTo(file);
+            var outputStream = new FileOutputStream(file);
+            outputStream.write(pluginFile.getBytes());
         } catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new FileSavingException();
         }
         return name;
     }
 
     @Override
-    public PluginDto changePluginData(PluginRestDto editDto) {
-        var plugin = getPlugin(editDto.getId());
+    public PluginDto changePluginData(Long id, PluginRestDto editDto) {
+        var plugin = getPlugin(id);
         plugin.setDescription(editDto.getDescription());
         plugin.setPrice(editDto.getPrice());
         plugin.setName(editDto.getName());
@@ -161,12 +156,15 @@ public class PluginService implements PluginServicePort {
     }
 
     @Override
-    public PluginDto updatePluginFile(Long id, MultipartFile pluginFile) {
-        var plugin = getPlugin(id);
-        var pluginFileName = savePlugin(pluginFile);
-        plugin.setIcon(pluginFileName);
-        var pluginDto = toDto(plugin);
-        return save(pluginDto);
+    public VersionDto updateVersionFile(Long id, MultipartFile pluginFile) {
+        var version = getVersionById(id);
+        var pluginFileName = savePluginFile(pluginFile);
+        version.setFile(pluginFileName);
+        return save(version);
+    }
+
+    private VersionDto save(VersionDto version) {
+        return pluginRepositoryPort.saveVersion(version);
     }
 
     @Override
@@ -177,8 +175,12 @@ public class PluginService implements PluginServicePort {
         var plugin = getPlugin(id);
         add(plugins, plugin);
         var updatedUserDto = toDto(user);
-        userRepositoryPort.saveUser(updatedUserDto);
+        save(updatedUserDto);
         return toDto(plugin);
+    }
+
+    private UserDto save(UserDto updatedUserDto) {
+        return userRepositoryPort.saveUser(updatedUserDto);
     }
 
     private void add(List<Plugin> plugins, Plugin plugin){
@@ -190,20 +192,19 @@ public class PluginService implements PluginServicePort {
     }
 
     @Override
-    public VersionDto addVersionToPluginOrUpdateById(VersionRestDto versionCreateDto, MultipartFile file) {
-        var plugin = getPlugin(versionCreateDto.getPluginId());
-        var pluginFileName = savePlugin(file);
-        var version = buildVersion(versionCreateDto, pluginFileName);
+    public VersionDto addVersionToPluginOrUpdateById(Long pluginId, VersionRestDto versionCreateDto) {
+        var plugin = getPlugin(pluginId);
+        var version = buildVersion(pluginId, versionCreateDto);
         var versions = plugin.getVersions();
         versions.add(version);
-        return versionToDto(version);
+        var savedVersion = save(versionToDto(version));
+        return savedVersion;
     }
 
-    private Version buildVersion(VersionRestDto versionCreateDto, String pluginFileName) {
+    private Version buildVersion(Long pluginId, VersionRestDto versionCreateDto) {
         return Version.Builder.aVersion()
-                .pluginId(versionCreateDto.getPluginId())
+                .pluginId(pluginId)
                 .changelog(versionCreateDto.getChangelog())
-                .file(pluginFileName)
                 .version(versionCreateDto.getVersion())
                 .build();
     }
@@ -231,6 +232,41 @@ public class PluginService implements PluginServicePort {
     @Override
     public VersionDto getVersionById(Long id) {
         return pluginRepositoryPort.getVersionById(id);
+    }
+
+    @Override
+    public byte[] dowanloadPluginByVersionId(Long versionId, String token) {
+        var version = pluginRepositoryPort.getVersionById(versionId);
+        var plugin = getPlugin(version.getPluginId());
+        var user = getUserFromToken(token);
+        if(Objects.equals(plugin.getType(), PluginType.PREMIUM) && !user.getPlugins().contains(plugin)){
+            throw new UserDoesNotHavePlugin(plugin.getId(), user.getEmail());
+        }
+        var currentClass = this.getClass();
+        var resource = currentClass.getResource(PLUGIN_CLASSPATH +version.getFile()+PLUGIN_FORMAT);
+        try {
+            var stream = resource.openStream();
+            return stream.readAllBytes();
+        } catch (IOException e) {
+            throw new FileReadingException(version.getFile());
+        }
+    }
+
+    @Override
+    public byte[] dowanloadIconByPluginId(long id) {
+        var plugin = getPlugin(id);
+        var currentClass = this.getClass();
+        var resource = currentClass.getResource(ICON_CLASSPATH +plugin.getIcon()+ICON_FORMAT);
+        try {
+            var stream = resource.openStream();
+            return stream.readAllBytes();
+        } catch (IOException e) {
+            throw new FileReadingException(plugin.getIcon());
+        }
+    }
+
+    private UserDto getUserFromToken(String token) {
+        return getUser(jwtPort.getSubject(token));
     }
 
     private UserDto getUser(String email) {

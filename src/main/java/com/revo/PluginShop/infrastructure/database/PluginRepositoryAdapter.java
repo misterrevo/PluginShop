@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.revo.PluginShop.infrastructure.database.Mapper.toDomain;
+import static com.revo.PluginShop.infrastructure.database.Mapper.toEntity;
 
 @RequiredArgsConstructor
 @Component
@@ -70,11 +71,6 @@ class PluginRepositoryAdapter implements PluginRepositoryPort {
     }
 
     @Override
-    public long getNextIdOfPlugin() {
-        return pluginRepository.getNextIdOfPlugin();
-    }
-
-    @Override
     public void deletePluginById(Long id) {
         pluginRepository.deleteById(id);
     }
@@ -88,6 +84,13 @@ class PluginRepositoryAdapter implements PluginRepositoryPort {
     public VersionDto getVersionById(Long id) {
         var version = getVersion(id);
         return toDomain(version);
+    }
+
+    @Override
+    public VersionDto saveVersion(VersionDto version) {
+        var versionEntity = toEntity(version);
+        var savedVersionEntity = versionRepository.save(versionEntity);
+        return toDomain(savedVersionEntity);
     }
 
     private VersionEntity getVersion(Long id) {

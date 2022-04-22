@@ -1,5 +1,6 @@
 package com.revo.PluginShop.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Plugin {
@@ -115,7 +116,7 @@ class Plugin {
         private String description;
         private PluginType type;
         private double price;
-        private List<Version> versions;
+        private List<Version> versions = new ArrayList<>();
         private double minecraftVersion;
         private String videoUrl;
         private String icon;

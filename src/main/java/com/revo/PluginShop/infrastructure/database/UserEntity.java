@@ -37,7 +37,9 @@ class UserEntity {
     private boolean locked;
     @Column(nullable = false)
     private boolean enabled;
-    @OneToMany
+    @Column(nullable = false)
+    private String authority;
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @Builder.Default
     private List<PluginEntity> plugins = new ArrayList<>();

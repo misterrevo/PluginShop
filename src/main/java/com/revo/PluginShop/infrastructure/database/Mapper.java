@@ -5,6 +5,7 @@ import com.revo.PluginShop.domain.dto.UserDto;
 import com.revo.PluginShop.domain.dto.VersionDto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 class Mapper {
 
@@ -15,6 +16,7 @@ class Mapper {
                 .password(userDto.getPassword())
                 .locked(userDto.isLocked())
                 .enabled(userDto.isEnabled())
+                .authority(userDto.getAuthority())
                 .plugins(mapPluginsToEntity(userDto.getPlugins()))
                 .build();
     }
@@ -22,7 +24,7 @@ class Mapper {
     private static List<PluginEntity> mapPluginsToEntity(List<PluginDto> plugins) {
         return plugins.stream()
                 .map(Mapper::toEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     static PluginEntity toEntity(PluginDto pluginDto){
@@ -43,10 +45,10 @@ class Mapper {
     private static List<VersionEntity> mapVersionsToEntity(List<VersionDto> versions) {
         return versions.stream()
                 .map(Mapper::toEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    private static VersionEntity toEntity(VersionDto versionDto) {
+    static VersionEntity toEntity(VersionDto versionDto) {
         return VersionEntity.builder()
                 .id(versionDto.getId())
                 .pluginId(versionDto.getPluginId())
@@ -63,6 +65,7 @@ class Mapper {
                 .password(userEntity.getPassword())
                 .locked(userEntity.isLocked())
                 .enabled(userEntity.isEnabled())
+                .authority(userEntity.getAuthority())
                 .plugins(mapPluginsToDomain(userEntity.getPlugins()))
                 .build();
     }
@@ -70,7 +73,7 @@ class Mapper {
     private static List<PluginDto> mapPluginsToDomain(List<PluginEntity> plugins) {
         return plugins.stream()
                 .map(Mapper::toDomain)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     static PluginDto toDomain(PluginEntity pluginEntity){
@@ -91,7 +94,7 @@ class Mapper {
     private static List<VersionDto> mapVersionsToDomain(List<VersionEntity> versions) {
         return versions.stream()
                 .map(Mapper::toDomain)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     static VersionDto toDomain(VersionEntity versionEntity) {

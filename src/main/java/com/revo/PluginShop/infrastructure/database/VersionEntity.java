@@ -27,7 +27,7 @@ class VersionEntity {
     private Long pluginId;
     @Column(nullable = false)
     private String version;
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String file;
     @Column(nullable = false, columnDefinition = "TEXT")
     private String changelog;

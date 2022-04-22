@@ -1,4 +1,4 @@
-package com.revo.PluginShop.infrastructure.encoder;
+package com.revo.PluginShop.infrastructure.utils;
 
 import com.revo.PluginShop.domain.port.EncoderPort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
