@@ -15,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,28 +67,28 @@ class PluginController {
         return ResponseEntity.created(URI.create(PLUGINS_LOCATION)).body(plugin);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @ForAdmin
     ResponseEntity<PluginDto> changePluginData(@PathVariable long id, @Valid @RequestBody PluginRestDto editDto){
         var plugin = pluginServicePort.changePluginData(id, editDto);
         return ResponseEntity.ok(plugin);
     }
 
-    @PatchMapping("/{id}/icons")
+    @PostMapping("/{id}/icons")
     @ForAdmin
     ResponseEntity<PluginDto> changePluginIcon(@PathVariable long id, @RequestParam MultipartFile iconFile){
         var plugin = pluginServicePort.changePluginIcon(id, iconFile);
         return ResponseEntity.ok(plugin);
     }
 
-    @PatchMapping("/versions/{id}/files")
+    @PostMapping("/versions/{id}/files")
     @ForAdmin
     ResponseEntity<VersionDto> changeVersionFile(@PathVariable long id, @RequestParam MultipartFile pluginFile){
         var version = pluginServicePort.updateVersionFile(id, pluginFile);
         return ResponseEntity.ok(version);
     }
 
-    @PatchMapping("/{id}/versions")
+    @PutMapping("/{id}/versions")
     @ForAdmin
     ResponseEntity<VersionDto> addVersionToPluginOrUpdateById(@PathVariable long id, @Valid @RequestBody VersionRestDto versionRestDto){
         var version = pluginServicePort.addVersionToPluginOrUpdateById(id, versionRestDto);
@@ -101,7 +101,7 @@ class PluginController {
         pluginServicePort.deletePluginById(id);
     }
 
-    @PatchMapping("/versions/{id}")
+    @PutMapping("/versions/{id}")
     @ForAdmin
     void deleteVersionById(@PathVariable long id){
         pluginServicePort.deleteVersionById(id);
@@ -121,15 +121,20 @@ class PluginController {
 
     @GetMapping("/versions/{id}/files")
     @ForUser
-    ResponseEntity<byte[]> dowanloadFile(@RequestHeader(AUTHORIZATION_HEADER) String token, @PathVariable long id){
+    ResponseEntity<byte[]> downloadFile(@RequestHeader(AUTHORIZATION_HEADER) String token, @PathVariable long id){
         var resource = pluginServicePort.dowanloadPluginByVersionId(id, token);
         var plugin = pluginServicePort.getPluginById(id);
-        return ResponseEntity.ok().header("Content-Type", "multipart/form-data").header("Content-Disposition", "attachment; filename="+plugin.getName()+".jar").body(resource);
+        return ResponseEntity.ok()
+                .header("Content-Type", "multipart/form-data")
+                .header("Content-Disposition", "attachment; filename="+plugin.getName()+".jar")
+                .body(resource);
     }
 
     @GetMapping("/{id}/icons")
-    ResponseEntity<byte[]> dowanloadIcon(@PathVariable long id){
+    ResponseEntity<byte[]> downloadIcon(@PathVariable long id){
         var resource = pluginServicePort.dowanloadIconByPluginId(id);
-        return ResponseEntity.ok().header("Content-Type", "image/png").body(resource);
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(resource);
     }
 }

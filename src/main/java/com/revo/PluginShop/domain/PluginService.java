@@ -136,6 +136,7 @@ public class PluginService implements PluginServicePort {
         plugin.setName(editDto.getName());
         plugin.setType(PluginType.valueOf(editDto.getType()));
         plugin.setVideoUrl(editDto.getVideoUrl());
+        plugin.setMinecraftVersion(editDto.getMinecraftVersion());
         var pluginDto = toDto(plugin);
         return save(pluginDto);
     }
@@ -247,8 +248,8 @@ public class PluginService implements PluginServicePort {
         try {
             var stream = resource.openStream();
             return stream.readAllBytes();
-        } catch (IOException e) {
-            throw new FileReadingException(version.getFile());
+        } catch (Exception e) {
+            throw new FileReadingException(version.getFile(), PLUGIN_CLASSPATH +version.getFile()+PLUGIN_FORMAT);
         }
     }
 
@@ -260,8 +261,8 @@ public class PluginService implements PluginServicePort {
         try {
             var stream = resource.openStream();
             return stream.readAllBytes();
-        } catch (IOException e) {
-            throw new FileReadingException(plugin.getIcon());
+        } catch (Exception e) {
+            throw new FileReadingException(plugin.getIcon(), ICON_CLASSPATH +plugin.getIcon()+ICON_FORMAT);
         }
     }
 

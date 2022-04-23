@@ -1,5 +1,6 @@
 package com.revo.PluginShop.infrastructure.application.rest;
 
+import com.revo.PluginShop.domain.exception.FileReadingException;
 import com.revo.PluginShop.domain.exception.FileSavingException;
 import com.revo.PluginShop.domain.exception.PluginDoesNotExistsException;
 import com.revo.PluginShop.domain.exception.VersionDoesNotExistsException;
@@ -14,6 +15,12 @@ class PluginControllerAdvice {
     @ExceptionHandler(FileSavingException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     String fileSavingException(FileSavingException exception){
+        return exception.getMessage();
+    }
+
+    @ExceptionHandler(FileReadingException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    String fileReadingException(FileReadingException exception){
         return exception.getMessage();
     }
 

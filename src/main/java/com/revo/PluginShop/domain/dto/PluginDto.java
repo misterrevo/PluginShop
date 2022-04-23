@@ -5,7 +5,6 @@ import java.util.List;
 public class PluginDto {
 
     private Long id;
-    private Long userId;
     private String name;
     private String description;
     private String type;
@@ -15,9 +14,8 @@ public class PluginDto {
     private String videoUrl;
     private String icon;
 
-    public PluginDto(Long id, Long userId, String name, String description, String type, double price, List<VersionDto> versions, double minecraftVersion, String videoUrl, String icon) {
+    public PluginDto(Long id, String name, String description, String type, double price, List<VersionDto> versions, double minecraftVersion, String videoUrl, String icon) {
         this.id = id;
-        this.userId = userId;
         this.name = name;
         this.description = description;
         this.type = type;
@@ -100,17 +98,8 @@ public class PluginDto {
         this.icon = icon;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     public static final class Builder {
         private Long id;
-        private Long userId;
         private String name;
         private String description;
         private String type;
@@ -129,11 +118,6 @@ public class PluginDto {
 
         public Builder id(Long id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder userId(Long userId){
-            this.userId = userId;
             return this;
         }
 
@@ -178,7 +162,7 @@ public class PluginDto {
         }
 
         public PluginDto build() {
-            return new PluginDto(id, userId, name, description, type, price, versions, minecraftVersion, videoUrl, icon);
+            return new PluginDto(id, name, description, type, price, versions, minecraftVersion, videoUrl, icon);
         }
     }
 }

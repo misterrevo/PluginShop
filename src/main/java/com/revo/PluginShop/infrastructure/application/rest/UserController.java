@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,9 +51,9 @@ class UserController {
         return ResponseEntity.created(URI.create(USERS_LOCATION)).body(userDto);
     }
 
-    @PatchMapping("/{email}/{status}")
+    @PutMapping("/{email}/{status}")
     @ForAdmin
-    ResponseEntity<UserDto> changeBlockStatus(@Valid @Email @PathVariable String email, boolean status){
+    ResponseEntity<UserDto> changeBlockStatus(@Valid @Email @PathVariable String email, @PathVariable boolean status){
         var userDto = userServicePort.changeBlockStatus(email, status);
         return ResponseEntity.ok(userDto);
     }

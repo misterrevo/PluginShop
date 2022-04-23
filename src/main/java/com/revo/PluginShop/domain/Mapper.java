@@ -30,7 +30,6 @@ class Mapper {
     static Plugin fromDto(PluginDto pluginDto){
         return Plugin.Builder.aPlugin()
                 .id(pluginDto.getId())
-                .userId(pluginDto.getUserId())
                 .name(pluginDto.getName())
                 .description(pluginDto.getDescription())
                 .type(PluginType.valueOf(pluginDto.getType()))
@@ -80,7 +79,6 @@ class Mapper {
         var type = plugin.getType();
         return PluginDto.Builder.aPluginDto()
                 .id(plugin.getId())
-                .userId(plugin.getUserId())
                 .name(plugin.getName())
                 .description(plugin.getDescription())
                 .type(type.toString())

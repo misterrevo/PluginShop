@@ -40,6 +40,7 @@ class LoginFilter extends UsernamePasswordAuthenticationFilter {
             setDetails(request, token);
             return authenticate(token);
         } catch (IOException exception) {
+            System.out.println(exception.getMessage());
             throw new InternalAuthenticationServiceException(AUTHENTICATION_EXCEPTION_MESSAGE, exception);
         }
     }

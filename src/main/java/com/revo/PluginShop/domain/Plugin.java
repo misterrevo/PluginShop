@@ -6,7 +6,6 @@ import java.util.List;
 class Plugin {
 
     private Long id;
-    private Long userId;
     private String name;
     private String description;
     private PluginType type;
@@ -16,9 +15,8 @@ class Plugin {
     private String videoUrl;
     private String icon;
 
-    Plugin(Long id, Long userId, String name, String description, PluginType type, double price, List<Version> versions, double minecraftVersion, String videoUrl, String icon) {
+    Plugin(Long id, String name, String description, PluginType type, double price, List<Version> versions, double minecraftVersion, String videoUrl, String icon) {
         this.id = id;
-        this.userId = userId;
         this.name = name;
         this.description = description;
         this.type = type;
@@ -101,17 +99,8 @@ class Plugin {
         this.icon = icon;
     }
 
-    Long getUserId() {
-        return userId;
-    }
-
-    void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     static final class Builder {
         private Long id;
-        private Long userId;
         private String name;
         private String description;
         private PluginType type;
@@ -130,11 +119,6 @@ class Plugin {
 
         Builder id(Long id) {
             this.id = id;
-            return this;
-        }
-
-        Builder userId(Long userId){
-            this.userId = userId;
             return this;
         }
 
@@ -179,7 +163,7 @@ class Plugin {
         }
 
         Plugin build() {
-            return new Plugin(id, userId, name, description, type, price, versions, minecraftVersion, videoUrl, icon);
+            return new Plugin(id, name, description, type, price, versions, minecraftVersion, videoUrl, icon);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.revo.PluginShop.infrastructure.application.rest;
 
 import com.revo.PluginShop.MysqlContainer;
+import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.infrastructure.application.rest.dto.PluginRestDto;
 import com.revo.PluginShop.infrastructure.application.rest.dto.VersionRestDto;
 import org.junit.jupiter.api.Test;
@@ -14,12 +15,13 @@ import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingExcept
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import static com.revo.PluginShop.MysqlContainer.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +53,6 @@ class PluginControllerTest extends MysqlContainer {
     private static final String THROW_PLUGINS_CHANGE_ICON_END_POINT = "/plugins/-1/icons";
     private static final String PLUGIN_NAME = "plugin.jar";
     private static final String VERSIONS_CHANGE_FILE_END_POINT = "/plugins/versions/1/files";
-    private static final String FILE = "file";
     private static final String FILE_JSON_PATH = "$.file";
     private static final String THROW_VERSIONS_CHANGE_FILE_END_POINT = "/plugins/versions/-1/files";
     private static final String VERSION_NAME = "0.0.2";
@@ -65,9 +66,16 @@ class PluginControllerTest extends MysqlContainer {
     private static final Object TEST_NAME = "test";
     private static final String GET_VERSION_END_POINT = "/plugins/versions/1";
     private static final Object VERSION_GET = "0.0.1";
+    private static final String ICON_FILE = "iconFile";
+    private static final String PLUGIN_FILE = "pluginFile";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String DOWNLOAD_EMAIL = "payment@email.pl";
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtPort jwtPort;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -165,12 +173,12 @@ class PluginControllerTest extends MysqlContainer {
         var jsonString = objectMapper.writeValueAsString(pluginRestDto);
         //when
         //then
-        mockMvc.perform(patch(URI.create(PLUGINS_CHANGE_END_POINT))
+        mockMvc.perform(put(URI.create(PLUGINS_CHANGE_END_POINT))
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(jsonString))
-                .andExpect(jsonPath(NAME_JSON_PATH).value(PLUGIN_CREATE_NAME))
+                .andExpect(jsonPath(NAME_JSON_PATH).value(PLUGIN_CHANGE_NAME))
                 .andExpect(jsonPath(MINECRAFT_VERSION_JSON_PATH).value(1.18))
-                .andExpect(jsonPath(DESCRIPTION_JSON_PATH).value(PLUGIN_CREATE_NAME))
+                .andExpect(jsonPath(DESCRIPTION_JSON_PATH).value(PLUGIN_CHANGE_NAME))
                 .andExpect(jsonPath(PRICE_JSON_PATH).value(0.00))
                 .andExpect(jsonPath(TYPE_JSON_PATH).value(PLUGIN_CREATE_TYPE))
                 .andExpect(jsonPath(VIDEO_JSON_PATH).value(PLUGIN_CREATE_VIDEO))
@@ -195,7 +203,7 @@ class PluginControllerTest extends MysqlContainer {
         var jsonString = objectMapper.writeValueAsString(pluginRestDto);
         //when
         //then
-        mockMvc.perform(patch(URI.create(PLUGINS_CHANGE_END_POINT))
+        mockMvc.perform(put(URI.create(PLUGINS_CHANGE_END_POINT))
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(jsonString))
                 .andExpect(status().is(400));
@@ -208,19 +216,20 @@ class PluginControllerTest extends MysqlContainer {
         var iconFile = new MockMultipartFile(ICON_NAME, new byte[0]);
         //when
         //then
-        mockMvc.perform(multipart(PLUGINS_CHANGE_ICON_END_POINT).file(FILE, iconFile.getBytes()))
+        mockMvc.perform(multipart(PLUGINS_CHANGE_ICON_END_POINT).file(ICON_FILE, iconFile.getBytes()))
                 .andExpect(jsonPath(ICON_JSON_PATH).exists())
                 .andExpect(status().is(200));
     }
 
     @Test
     @WithMockUser(roles = ADMIN_ROLE)
-    void shouldThrowWhileChanginPluginIcon() throws Exception{
+    void shouldThrowWhileChangingPluginIcon() throws Exception{
         //given
         var iconFile = new MockMultipartFile(ICON_NAME, new byte[0]);
         //when
         //then
-        mockMvc.perform(multipart(THROW_PLUGINS_CHANGE_ICON_END_POINT))
+        mockMvc.perform(multipart(THROW_PLUGINS_CHANGE_ICON_END_POINT)
+                        .file(ICON_FILE, iconFile.getBytes()))
                 .andExpect(status().is(404));
     }
 
@@ -232,20 +241,20 @@ class PluginControllerTest extends MysqlContainer {
         //when
         //then
         mockMvc.perform(multipart(VERSIONS_CHANGE_FILE_END_POINT)
-                .file(FILE, pluginFile.getBytes()))
+                .file(PLUGIN_FILE, pluginFile.getBytes()))
                 .andExpect(jsonPath(FILE_JSON_PATH).exists())
                 .andExpect(status().is(200));
     }
 
     @Test
     @WithMockUser(roles = ADMIN_ROLE)
-    void shouldThrowWhileChaningVersionFile() throws Exception {
+    void shouldThrowWhileChangingVersionFile() throws Exception {
         //given
         var pluginFile = new MockMultipartFile(PLUGIN_NAME, new byte[0]);
         //when
         //then
         mockMvc.perform(multipart(THROW_VERSIONS_CHANGE_FILE_END_POINT)
-                        .file(FILE, pluginFile.getBytes()))
+                        .file(PLUGIN_FILE, pluginFile.getBytes()))
                 .andExpect(status().is(404));
     }
 
@@ -260,7 +269,7 @@ class PluginControllerTest extends MysqlContainer {
         var jsonString = objectMapper.writeValueAsString(versionRestDto);
         //when
         //then
-        mockMvc.perform(patch(URI.create(PLUGINS_ADD_VERSION_END_POINT))
+        mockMvc.perform(put(URI.create(PLUGINS_ADD_VERSION_END_POINT))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(jsonString))
                 .andExpect(jsonPath(VERSION_JSON_PATH).value(VERSION_NAME))
@@ -280,17 +289,18 @@ class PluginControllerTest extends MysqlContainer {
     }
 
     @Test
-    void deleteVersionById() throws Exception{
+    @WithMockUser(roles = ADMIN_ROLE)
+    void shouldDeleteVersionById() throws Exception{
         //given
         //when
-        mockMvc.perform(patch(URI.create(DELETE_VERSION_END_POINT)));
+        mockMvc.perform(put(URI.create(DELETE_VERSION_END_POINT)));
         //then
         mockMvc.perform(get(DELETE_VERSION_END_POINT))
                 .andExpect(status().is(404));
     }
 
     @Test
-    void getPluginById() throws Exception{
+    void shouldGetPluginById() throws Exception{
         //given
         //when
         //then
@@ -300,7 +310,7 @@ class PluginControllerTest extends MysqlContainer {
     }
 
     @Test
-    void getVersionById() throws Exception{
+    void shouldGetVersionById() throws Exception{
         //given
         //when
         //then
@@ -309,16 +319,28 @@ class PluginControllerTest extends MysqlContainer {
     }
 
     @Test
-    void dowanloadFile() {
+    @WithMockUser(roles = ADMIN_ROLE)
+    void shouldDownloadFile() throws Exception{
         //given
+        var pluginFile = new MockMultipartFile(PLUGIN_NAME, PLUGIN_NAME.getBytes(StandardCharsets.UTF_8));
         //when
+        mockMvc.perform(multipart(VERSIONS_CHANGE_FILE_END_POINT)
+                        .file(PLUGIN_FILE, pluginFile.getBytes()));
         //then
+        mockMvc.perform(get(URI.create(VERSIONS_CHANGE_FILE_END_POINT)).header(AUTHORIZATION_HEADER, jwtPort.getToken(DOWNLOAD_EMAIL)))
+                .andExpect(status().is(200));
     }
 
     @Test
-    void dowanloadIcon() {
+    @WithMockUser(roles = ADMIN_ROLE)
+    void shouldDownloadIcon() throws Exception{
         //given
+        var iconFile = new MockMultipartFile(ICON_NAME, PLUGIN_NAME.getBytes(StandardCharsets.UTF_8));
         //when
+        mockMvc.perform(multipart(PLUGINS_CHANGE_ICON_END_POINT)
+                .file(ICON_FILE, iconFile.getBytes()));
         //then
+        mockMvc.perform(get(URI.create(PLUGINS_CHANGE_ICON_END_POINT)))
+                .andExpect(status().is(200));
     }
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,8 +31,6 @@ class PluginEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "user_id")
-    private Long userId;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
@@ -40,7 +39,7 @@ class PluginEntity {
     private String type;
     @Column(nullable = false)
     private double price;
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @OrderBy("version")
     @JoinColumn(name = "plugin_id")
     @Builder.Default

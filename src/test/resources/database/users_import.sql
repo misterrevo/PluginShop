@@ -1,1 +1,2 @@
-INSERT INTO users (id, email, enabled, locked, password, authority) VALUES (null, "payment@email.pl", 1, 0, "$2a$10$T7jxjJHtXTwFrStcwBCJX.rCsGHfFFsPg.jg1wJKKjttC23.1Dw/u", "USER");
+INSERT INTO users (id, email, enabled, locked, password, authority) VALUES (null, "payment@email.pl", 1, 0, "$2a$12$T3eWUP2Qo1SDVwNy3AERsOnQ.O1o5wux08h3MhJZlsDOhmKrBkGRy", "USER");
+INSERT INTO users (id, email, enabled, locked, password, authority) VALUES (null, "tolock@email.pl", 1, 0, "$2a$12$T3eWUP2Qo1SDVwNy3AERsOnQ.O1o5wux08h3MhJZlsDOhmKrBkGRy", "USER");

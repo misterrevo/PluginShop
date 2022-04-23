@@ -1,7 +1,9 @@
 package com.revo.PluginShop.infrastructure.application.rest.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;

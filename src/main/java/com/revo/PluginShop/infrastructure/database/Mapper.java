@@ -30,7 +30,6 @@ class Mapper {
     static PluginEntity toEntity(PluginDto pluginDto){
         return PluginEntity.builder()
                 .id(pluginDto.getId())
-                .userId(pluginDto.getUserId())
                 .name(pluginDto.getName())
                 .description(pluginDto.getDescription())
                 .type(pluginDto.getType())
@@ -79,7 +78,6 @@ class Mapper {
     static PluginDto toDomain(PluginEntity pluginEntity){
         return PluginDto.Builder.aPluginDto()
                 .id(pluginEntity.getId())
-                .userId(pluginEntity.getUserId())
                 .name(pluginEntity.getName())
                 .description(pluginEntity.getDescription())
                 .type(pluginEntity.getType())

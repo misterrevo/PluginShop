@@ -73,7 +73,7 @@ public class UserService implements UserServicePort {
     @Override
     public UserDto changeBlockStatus(String email, boolean status) {
         var userDto = getUserByEmail(email);
-        userDto.setEnabled(true);
+        userDto.setLocked(status);
         return saveUser(userDto);
     }
 }
