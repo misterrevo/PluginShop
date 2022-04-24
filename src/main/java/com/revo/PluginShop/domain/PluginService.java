@@ -12,14 +12,15 @@ import com.revo.PluginShop.domain.exception.UserDoesNotHavePlugin;
 import com.revo.PluginShop.domain.port.JwtPort;
 import com.revo.PluginShop.domain.port.PluginRepositoryPort;
 import com.revo.PluginShop.domain.port.PluginServicePort;
+import com.revo.PluginShop.domain.port.ResourceUtilsPort;
 import com.revo.PluginShop.domain.port.UserRepositoryPort;
 import com.revo.PluginShop.infrastructure.application.rest.dto.PluginRestDto;
 import com.revo.PluginShop.infrastructure.application.rest.dto.VersionRestDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,17 +34,17 @@ public class PluginService implements PluginServicePort {
     private static final String PLUGIN_RESOURCE_PATH = "src/main/resources/plugins/";
     private static final String ICON_FORMAT = ".png";
     private static final String PLUGIN_FORMAT = ".jar";
-    private static final String ICON_CLASSPATH = "/icons/";
-    private static final String PLUGIN_CLASSPATH = "/plugins/";
 
     private final PluginRepositoryPort pluginRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
     private final JwtPort jwtPort;
+    private final ResourceUtilsPort resourceUtilsPort;
 
-    public PluginService(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort, JwtPort jwtPort) {
+    public PluginService(PluginRepositoryPort pluginRepositoryPort, UserRepositoryPort userRepositoryPort, JwtPort jwtPort, ResourceUtilsPort resourceUtilsPort) {
         this.pluginRepositoryPort = pluginRepositoryPort;
         this.userRepositoryPort = userRepositoryPort;
         this.jwtPort = jwtPort;
+        this.resourceUtilsPort = resourceUtilsPort;
     }
 
     @Override
@@ -236,34 +237,33 @@ public class PluginService implements PluginServicePort {
     }
 
     @Override
-    public byte[] dowanloadPluginByVersionId(Long versionId, String token) {
+    public byte[] downloadPluginByVersionId(Long versionId, String token) {
         var version = pluginRepositoryPort.getVersionById(versionId);
         var plugin = getPlugin(version.getPluginId());
         var user = getUserFromToken(token);
         if(Objects.equals(plugin.getType(), PluginType.PREMIUM) && !user.getPlugins().contains(plugin)){
             throw new UserDoesNotHavePlugin(plugin.getId(), user.getEmail());
         }
-        var currentClass = this.getClass();
-        var resource = currentClass.getResource(PLUGIN_CLASSPATH +version.getFile()+PLUGIN_FORMAT);
         try {
-            var stream = resource.openStream();
-            return stream.readAllBytes();
+            var resourceFile = resourceUtilsPort.getFile(PLUGIN_RESOURCE_PATH+version.getFile()+PLUGIN_FORMAT);
+            var inputStream = new FileInputStream(resourceFile);
+            return inputStream.readAllBytes();
         } catch (Exception e) {
-            throw new FileReadingException(version.getFile(), PLUGIN_CLASSPATH +version.getFile()+PLUGIN_FORMAT);
+            throw new FileReadingException(version.getFile(), PLUGIN_RESOURCE_PATH +version.getFile()+PLUGIN_FORMAT);
         }
     }
 
     @Override
-    public byte[] dowanloadIconByPluginId(long id) {
+    public byte[] downloadIconByPluginId(long id) {
         var plugin = getPlugin(id);
-        var currentClass = this.getClass();
-        var resource = currentClass.getResource(ICON_CLASSPATH +plugin.getIcon()+ICON_FORMAT);
         try {
-            var stream = resource.openStream();
-            return stream.readAllBytes();
+            var resourceFile = resourceUtilsPort.getFile(ICON_RESOURCE_PATH+plugin.getIcon()+ICON_FORMAT);
+            var inputStream = new FileInputStream(resourceFile);
+            return inputStream.readAllBytes();
         } catch (Exception e) {
-            throw new FileReadingException(plugin.getIcon(), ICON_CLASSPATH +plugin.getIcon()+ICON_FORMAT);
+            throw new FileReadingException(plugin.getIcon(), ICON_RESOURCE_PATH +plugin.getIcon()+ICON_FORMAT);
         }
+
     }
 
     private UserDto getUserFromToken(String token) {

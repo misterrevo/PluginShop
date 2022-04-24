@@ -24,6 +24,6 @@ public interface PluginServicePort {
     void deleteVersionById(Long id);
     PluginDto getPluginById(Long id);
     VersionDto getVersionById(Long id);
-    byte[] dowanloadPluginByVersionId(Long versionId, String token);
-    byte[] dowanloadIconByPluginId(long id);
+    byte[] downloadPluginByVersionId(Long versionId, String token);
+    byte[] downloadIconByPluginId(long id);
 }

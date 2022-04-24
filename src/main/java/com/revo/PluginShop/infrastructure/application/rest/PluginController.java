@@ -122,7 +122,7 @@ class PluginController {
     @GetMapping("/versions/{id}/files")
     @ForUser
     ResponseEntity<byte[]> downloadFile(@RequestHeader(AUTHORIZATION_HEADER) String token, @PathVariable long id){
-        var resource = pluginServicePort.dowanloadPluginByVersionId(id, token);
+        var resource = pluginServicePort.downloadPluginByVersionId(id, token);
         var plugin = pluginServicePort.getPluginById(id);
         return ResponseEntity.ok()
                 .header("Content-Type", "multipart/form-data")
@@ -132,7 +132,7 @@ class PluginController {
 
     @GetMapping("/{id}/icons")
     ResponseEntity<byte[]> downloadIcon(@PathVariable long id){
-        var resource = pluginServicePort.dowanloadIconByPluginId(id);
+        var resource = pluginServicePort.downloadIconByPluginId(id);
         return ResponseEntity.ok()
                 .header("Content-Type", "image/png")
                 .body(resource);

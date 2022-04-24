@@ -1,0 +1,2 @@
+INSERT INTO projects (id, phone, email, description) VALUES (null, "000000000", "test@email.pl", "test");
+INSERT INTO projects (id, phone, email, description) VALUES (null, "000000000", "delete@email.pl", "delete");
