@@ -1,0 +1,3 @@
+# PluginShop
+
+Plugin shop project
